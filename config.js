@@ -7,5 +7,5 @@
  * Só precisa editar este arquivo — nada mais.
  */
 const CONFIG = {
-  WORKER_URL: 'https://SEU-WORKER.workers.dev',  // ← substitua aqui
+  WORKER_URL: 'https://shrill-lab-5504.andresthill17.workers.dev',
 };
