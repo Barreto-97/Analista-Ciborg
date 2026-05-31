@@ -31,15 +31,16 @@ async function checkWorkerStatus() {
   dot.className = 'worker-dot pending';
   label.textContent = 'Verificando...';
   try {
+    // Envia { ping: true } — o Worker responde sem chamar o Gemini
     const res = await fetch(CONFIG.WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: 'ping' }),
+      body: JSON.stringify({ ping: true }),
     });
     const data = await res.json().catch(() => ({}));
-    if (data.error?.includes('GEMINI_API_KEY')) {
+    if (data.ok === false || data.error) {
       dot.className = 'worker-dot error';
-      label.textContent = 'Chave Gemini não configurada';
+      label.textContent = data.message || 'Chave Gemini não configurada';
     } else {
       dot.className = 'worker-dot ok';
       label.textContent = 'IA conectada (gratuito)';
