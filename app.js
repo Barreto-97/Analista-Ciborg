@@ -267,12 +267,24 @@ async function callWorker(prompt) {
   return data.text || '';
 }
 
+// ─── PRÉ-PROCESSAMENTO DE TEXTO ───────────────
+// Reduz o texto bruto do PDF mantendo só linhas relevantes
+function preprocessText(text, maxChars) {
+  if (!text) return '';
+  // Remove linhas com só traços, espaços ou vazias repetidas
+  const lines = text.split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 2 && !/^[-=_*]{3,}$/.test(l));
+  // Junta e trunca
+  return lines.join('\n').slice(0, maxChars);
+}
+
 // ─── PROMPT ───────────────────────────────────
 function buildPrompt({ lote, invText, packText, hblText, hasInv, hasPack, hasHbl }) {
   const sections = [];
-  if (hasInv)  sections.push(`COMMERCIAL INVOICE(S) — LOTE ${lote}:\n${invText.slice(0, 4000)}`);
-  if (hasPack) sections.push(`PACKING LIST(S) — LOTE ${lote}:\n${packText.slice(0, 2000)}`);
-  if (hasHbl)  sections.push(`BILL OF LADING — LOTE ${lote}:\n${hblText.slice(0, 2000)}`);
+  if (hasInv)  sections.push(`COMMERCIAL INVOICE(S) — LOTE ${lote}:\n${preprocessText(invText, 3500)}`);
+  if (hasPack) sections.push(`PACKING LIST(S) — LOTE ${lote}:\n${preprocessText(packText, 2000)}`);
+  if (hasHbl)  sections.push(`BILL OF LADING — LOTE ${lote}:\n${preprocessText(hblText, 1500)}`);
 
   return `Você é um especialista em conferência documental aduaneira brasileira.
 
