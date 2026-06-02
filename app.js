@@ -189,6 +189,11 @@ async function startProcessing() {
     setLoadingStep(`Analisando lote ${lote} com Gemini...`);
     try { allResults.push(await analyzeLote(lote, lotes[lote])); }
     catch(e) { allResults.push({ lote, error: e.message }); }
+    // Pausa entre lotes para respeitar o limite de RPM do Gemini gratuito
+    if (loteKeys.indexOf(lote) < loteKeys.length - 1) {
+      setLoadingStep('Aguardando limite de requisições...');
+      await sleep(8000);
+    }
     setProgress(55 + Math.round((allResults.length / loteKeys.length) * 43));
   }
 
@@ -265,9 +270,9 @@ async function callWorker(prompt) {
 // ─── PROMPT ───────────────────────────────────
 function buildPrompt({ lote, invText, packText, hblText, hasInv, hasPack, hasHbl }) {
   const sections = [];
-  if (hasInv)  sections.push(`COMMERCIAL INVOICE(S) — LOTE ${lote}:\n${invText.slice(0, 10000)}`);
-  if (hasPack) sections.push(`PACKING LIST(S) — LOTE ${lote}:\n${packText.slice(0, 6000)}`);
-  if (hasHbl)  sections.push(`BILL OF LADING — LOTE ${lote}:\n${hblText.slice(0, 5000)}`);
+  if (hasInv)  sections.push(`COMMERCIAL INVOICE(S) — LOTE ${lote}:\n${invText.slice(0, 4000)}`);
+  if (hasPack) sections.push(`PACKING LIST(S) — LOTE ${lote}:\n${packText.slice(0, 2000)}`);
+  if (hasHbl)  sections.push(`BILL OF LADING — LOTE ${lote}:\n${hblText.slice(0, 2000)}`);
 
   return `Você é um especialista em conferência documental aduaneira brasileira.
 
