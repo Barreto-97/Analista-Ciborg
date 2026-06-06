@@ -253,6 +253,7 @@ async function analyzeLote(lote, loteData) {
 
 // ─── CALL WORKER ──────────────────────────────
 async function callWorker(prompt) {
+  setLoadingStep('Enviando para análise... (pode levar até 30s)');
   const res = await fetch(CONFIG.WORKER_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
